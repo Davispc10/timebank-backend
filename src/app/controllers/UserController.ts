@@ -1,14 +1,7 @@
 import { Request, Response } from 'express'
 import { getRepository } from 'typeorm'
 
-import User, { UserRole } from '../models/User'
-
-interface CreateUserDTO {
-  firstName: string
-  lastname?: string
-  email: string
-  role: UserRole
-}
+import User from '../models/User'
 
 class UserController {
   public async index (req: Request, res: Response): Promise<Response> {
@@ -18,11 +11,23 @@ class UserController {
   }
 
   public async store (req: Request, res: Response): Promise<Response> {
-    const userData: CreateUserDTO = req.body
+    const userData: User = req.body
 
-    const user = await getRepository(User).save(userData)
+    const userExist = await getRepository(User).findOne({
+      where: {
+        email: userData.email
+      }
+    })
 
-    return res.json(user)
+    if (userExist) {
+      return res.status(400).json({ error: 'User already exits' })
+    }
+
+    const user = new User(userData.name, userData.username, userData.email, userData.password, userData.gender, userData.active, userData.role)
+
+    const { id, username, name, email, role } = await getRepository(User).save(user)
+
+    return res.json({ id, username, name, email, role })
   }
 }
 
