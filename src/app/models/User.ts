@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, OneToMany, BeforeInsert } from 'typeorm'
-import { MinLength, IsDate, IsEmail, IsString, IsDefined, IsPhoneNumber, IsBoolean, IsOptional, IsEnum } from 'class-validator'
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, OneToMany, BeforeInsert, BeforeUpdate } from 'typeorm'
+import { MinLength, IsEmail, IsString, IsDefined, IsPhoneNumber, IsBoolean, IsOptional, IsEnum, IsDateString } from 'class-validator'
 import bcrypt from 'bcryptjs'
 
 import File from './File'
@@ -37,20 +37,23 @@ class User {
   @Column()
   email: string
 
-  @Column()
-  passwordHash: string
+  @IsString()
+  @IsOptional()
+  @MinLength(6)
+  oldPassword: string
 
   @IsString()
-  @IsDefined()
+  @IsOptional()
   @MinLength(6)
+  @Column()
   password: string
 
-  @BeforeInsert()
-  hashPassword (): void {
-    this.passwordHash = bcrypt.hashSync(this.password, 8)
-  }
+  @IsString()
+  @IsOptional()
+  @MinLength(6)
+  confirmPassword: string
 
-  @IsDate()
+  @IsDateString()
   @IsOptional()
   @Column({ nullable: true })
   dateBorn: Date
@@ -60,7 +63,7 @@ class User {
   @Column({ type: 'enum', enum: Gender })
   gender: Gender
 
-  @IsDate()
+  @IsDateString()
   @IsOptional()
   @Column({ nullable: true })
   admissionDate: Date
@@ -102,14 +105,18 @@ class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  constructor (name: string, username: string, email: string, password: string, gender: Gender, active: boolean, role: UserRole) {
-    this.name = name
-    this.username = username
-    this.email = email
-    this.password = password
-    this.gender = gender
-    this.active = active
-    this.role = role
+  @BeforeInsert()
+  @BeforeUpdate()
+  hashPassword (): void {
+    this.password = bcrypt.hashSync(this.password, 8)
+  }
+
+  checkPassword (password: string): Promise<boolean> {
+    return bcrypt.compare(password, this.password)
+  }
+
+  constructor (user: User) {
+    Object.assign(this, user)
   }
 }
 
