@@ -5,13 +5,21 @@ import User from '../models/User'
 
 class UserController {
   public async index (req: Request, res: Response): Promise<Response> {
-    const users = await getRepository(User).find({ select: ['id', 'name', 'username', 'email', 'phone', 'active'] })
+    const users = await getRepository(User).find({
+      select: ['id', 'firstName', 'username', 'email', 'phone', 'active'],
+      order: {
+        firstName: 'ASC'
+      }
+    })
 
     return res.json(users)
   }
 
   public async show (req: Request, res: Response): Promise<Response> {
-    const user = await getRepository(User).findOne(req.params.id, { select: ['id', 'avatar', 'name', 'username', 'email', 'phone', 'dateBorn', 'gender', 'admissionDate', 'position', 'role', 'active'], relations: ['avatar'] })
+    const user = await getRepository(User).findOne(req.params.id, {
+      select: ['id', 'avatar', 'firstName', 'lastName', 'username', 'email', 'phone', 'dateBorn', 'gender', 'admissionDate', 'position', 'role', 'active'],
+      relations: ['avatar']
+    })
 
     if (!user) {
       return res.status(400).json({ error: 'User not found!' })
@@ -37,9 +45,9 @@ class UserController {
 
     const user = new User(userData)
 
-    const { id, username, name, email, role } = await getRepository(User).save(user)
+    const { id, username, firstName, email, role } = await getRepository(User).save(user)
 
-    return res.json({ id, username, name, email, role })
+    return res.json({ id, username, firstName, email, role })
   }
 
   public async update (req: Request, res: Response): Promise<Response> {
@@ -75,9 +83,9 @@ class UserController {
 
     await getRepository(User).save(newUser)
 
-    const { id, name } = await getRepository(User).findOne(newUser.id) as User
+    const { id, firstName } = await getRepository(User).findOne(newUser.id) as User
 
-    return res.json({ id, name, email, username })
+    return res.json({ id, firstName, email, username })
   }
 }
 

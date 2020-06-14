@@ -22,9 +22,12 @@ class User {
   id: number
 
   @IsString()
-  @IsDefined()
-  @Column()
-  name: string
+  @Column({ nullable: true })
+  firstName: string
+
+  @IsString()
+  @Column({ nullable: true })
+  lastName: string
 
   @IsString()
   @IsDefined()

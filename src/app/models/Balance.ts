@@ -1,4 +1,6 @@
 import { CreateDateColumn, UpdateDateColumn, Column, Entity, OneToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm'
+import { IsDefined, IsString } from 'class-validator'
+
 import User from './User'
 
 @Entity()
@@ -10,14 +12,21 @@ class Balance {
   @JoinColumn()
   user: User
 
-  @Column()
-  balance: number
+  @IsDefined()
+  @IsString()
+  @Column('time')
+  value: string
 
   @CreateDateColumn()
   createdAt: Date
 
   @UpdateDateColumn()
   updatedAt: Date
+
+  constructor (user: User, balance: string) {
+    this.user = user
+    this.value = balance
+  }
 }
 
 export default Balance

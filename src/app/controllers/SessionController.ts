@@ -19,11 +19,11 @@ class SessionController {
       return res.status(401).json({ error: 'Password does not match' })
     }
 
-    const { id, name, email, avatar, role } = user
+    const { id, firstName, email, avatar, role } = user
 
     return res.json({
       user: {
-        id, name, username, email, role, avatar
+        id, firstName, username, email, role, avatar
       },
       token: jwt.sign({ id }, String(authConfig.secret), {
         expiresIn: authConfig.expiresIn
@@ -33,7 +33,7 @@ class SessionController {
 
   public async show (req: Request, res: Response): Promise<Response> {
     const user = await getRepository(User).findOne(req.userId, {
-      select: ['id', 'avatar', 'name', 'username', 'email', 'phone', 'dateBorn', 'gender', 'admissionDate', 'position', 'role', 'active'],
+      select: ['id', 'avatar', 'firstName', 'lastName', 'username', 'email', 'phone', 'dateBorn', 'gender', 'admissionDate', 'position', 'role', 'active'],
       relations: ['avatar']
     })
 
@@ -77,9 +77,9 @@ class SessionController {
 
     await getRepository(User).save(newUser)
 
-    const { id, name, avatar } = await getRepository(User).findOne(newUser.id, { relations: ['avatar'] }) as User
+    const { id, firstName, avatar } = await getRepository(User).findOne(newUser.id, { relations: ['avatar'] }) as User
 
-    return res.json({ id, name, email, avatar })
+    return res.json({ id, firstName, email, avatar })
   }
 }
 

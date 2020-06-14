@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpileOnly src/server.ts"
+    "dev": "ts-node-dev --inspect --respawn --transpileOnly src/server.ts"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
@@ -38,6 +38,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.9",
     "pg": "^8.0.2",
+    "pipedrive": "^10.4.3",
     "reflect-metadata": "^0.1.13",
     "typeorm": "^0.2.24"
   }
